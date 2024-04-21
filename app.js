@@ -1,12 +1,13 @@
 require("dotenv").config();
 const fs = require("fs");
-
 const express = require("express");
-
+const morgan = require("morgan");
 const port = process.env.PORT || 3000;
 
 const app = express();
 
+//	1) Middlewares
+app.use(morgan("dev"));
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -23,6 +24,7 @@ let products = JSON.parse(
 	fs.readFileSync(`${__dirname}/dev-data/products.json`)
 );
 
+//	2) Routes Handlers
 const getAllProducts = (req, res) => {
 	res.status(200).json({
 		results: products.length,
@@ -128,12 +130,43 @@ const deleteProduct = (req, res) => {
 	);
 };
 
+const getAllUsers = (req, res) => {
+	res.status(500).json({
+		msg: "This route is not yet defined",
+	});
+};
+
+const createUser = (req, res) => {
+	res.status(500).json({
+		msg: "This route is not yet defined",
+	});
+};
+
+const getUser = (req, res) => {
+	res.status(500).json({
+		msg: "This route is not yet defined",
+	});
+};
+
+const updateUser = (req, res) => {
+	res.status(500).json({
+		msg: "This route is not yet defined",
+	});
+};
+
+const deleteUser = (req, res) => {
+	res.status(500).json({
+		msg: "This route is not yet defined",
+	});
+};
+
 // app.get("/api/v1/products", getAllProducts);
 // app.post("/api/v1/products", createProduct);
 // app.get("/api/v1/products/:id", getProduct);
 // app.patch("/api/v1/products/:id", updateProduct);
 // app.delete("/api/v1/products/:id", deleteProduct);
 
+//	3) Routes
 app.route("/api/v1/products")
 	.get(getAllProducts)
 	.post(createProduct);
@@ -143,6 +176,16 @@ app.route("/api/v1/products/:id")
 	.patch(updateProduct)
 	.delete(deleteProduct);
 
+app.route("/api/v1/users")
+	.get(getAllUsers)
+	.post(createUser);
+
+app.route("/api/v1/users/:id")
+	.get(getUser)
+	.patch(updateUser)
+	.delete(deleteUser);
+
+//	4) Star Server
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
