@@ -6,6 +6,8 @@ let products = JSON.parse(
 
 exports.checkID = (req, res, next, val) => {
   const { id } = req.params;
+  console.log(`Tour id is: ${val}`);
+
   const product = products.find((item) => item.id == id);
 
   if (!product) {
@@ -16,6 +18,18 @@ exports.checkID = (req, res, next, val) => {
 
   req.product = product;
 
+  next()
+}
+
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({
+      msg: `Missing name or price`
+    })
+  }
+  
   next()
 }
 

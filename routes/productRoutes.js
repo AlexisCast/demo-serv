@@ -11,9 +11,9 @@ router.param("id", (req, res, next, val) => {
 router.param("id",productController.checkID);
 
 router
-	.route("/")
-	.get(productController.getAllProducts)
-	.post(productController.createProduct);
+  .route("/")
+  .get(productController.getAllProducts)
+  .post(productController.checkBody, productController.createProduct);
 
 router
 	.route("/:id")
