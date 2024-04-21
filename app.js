@@ -194,7 +194,7 @@ userRouter
 	.delete(deleteUser);
 
 app.use("/api/v1/products", productRouter);
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 
 //	4) Star Server
 app.listen(port, () => {
