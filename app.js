@@ -2,7 +2,6 @@ require("dotenv").config();
 const fs = require("fs");
 
 const express = require("express");
-const { time } = require("console");
 
 const port = process.env.PORT || 3000;
 
@@ -14,16 +13,16 @@ let products = JSON.parse(
 	fs.readFileSync(`${__dirname}/dev-data/products.json`)
 );
 
-app.get("/api/v1/products", (req, res) => {
+const getAllProducts = (req, res) => {
 	res.status(200).json({
 		results: products.length,
 		data: {
 			products: products,
 		},
 	});
-});
+};
 
-app.get("/api/v1/products/:id", (req, res) => {
+const getProduct = (req, res) => {
 	const { id } = req.params;
 	const product = products.find((item) => item.id == id);
 	if (product) {
@@ -37,9 +36,9 @@ app.get("/api/v1/products/:id", (req, res) => {
 	res.status(404).json({
 		msg: `${id} invalid id`,
 	});
-});
+};
 
-app.post("/api/v1/products", (req, res) => {
+const createProduct = (req, res) => {
 	const newId = products[products.length - 1].id + 1;
 	const newProduct = {
 		id: newId,
@@ -59,9 +58,9 @@ app.post("/api/v1/products", (req, res) => {
 			});
 		}
 	);
-});
+};
 
-app.patch("/api/v1/products/:id", (req, res) => {
+const updateProduct = (req, res) => {
 	const { id } = req.params;
 	const product = products.find((item) => item.id == id);
 
@@ -91,9 +90,9 @@ app.patch("/api/v1/products/:id", (req, res) => {
 			});
 		}
 	);
-});
+};
 
-app.delete("/api/v1/products/:id", (req, res) => {
+const deleteProduct = (req, res) => {
 	const { id } = req.params;
 	const product = products.find((item) => item.id == id);
 
@@ -116,7 +115,22 @@ app.delete("/api/v1/products/:id", (req, res) => {
 			});
 		}
 	);
-});
+};
+
+// app.get("/api/v1/products", getAllProducts);
+// app.post("/api/v1/products", createProduct);
+// app.get("/api/v1/products/:id", getProduct);
+// app.patch("/api/v1/products/:id", updateProduct);
+// app.delete("/api/v1/products/:id", deleteProduct);
+
+app.route("/api/v1/products")
+	.get(getAllProducts)
+	.post(createProduct);
+
+app.route("/api/v1/products/:id")
+	.get(getProduct)
+	.patch(updateProduct)
+	.delete(deleteProduct);
 
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
