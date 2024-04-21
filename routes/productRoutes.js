@@ -8,7 +8,7 @@ router.param('id', (req, res, next, val) => {
   next();
 });
 
-router.param('id', productController.checkID);
+// router.param('id', productController.checkID);
 
 router
   .route('/')
