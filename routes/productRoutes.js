@@ -1,24 +1,24 @@
-const express = require("express");
-const productController = require("../controllers/productController");
+const express = require('express');
+const productController = require('../controllers/productController');
 
 const router = express.Router();
 
-router.param("id", (req, res, next, val) => {
-	console.log(`product id is: ${val}`);
-	next();
+router.param('id', (req, res, next, val) => {
+  console.log(`product id is: ${val}`);
+  next();
 });
 
-router.param("id",productController.checkID);
+router.param('id', productController.checkID);
 
 router
-  .route("/")
+  .route('/')
   .get(productController.getAllProducts)
   .post(productController.checkBody, productController.createProduct);
 
 router
-	.route("/:id")
-	.get(productController.getProduct)
-	.patch(productController.updateProduct)
-	.delete(productController.deleteProduct);
+  .route('/:id')
+  .get(productController.getProduct)
+  .patch(productController.updateProduct)
+  .delete(productController.deleteProduct);
 
 module.exports = router;
