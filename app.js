@@ -9,6 +9,16 @@ const app = express();
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+	console.log("hello!");
+	next();
+});
+
+app.use((req, res, next) => {
+	req.requestTime = new Date().toISOString();
+	next();
+});
+
 let products = JSON.parse(
 	fs.readFileSync(`${__dirname}/dev-data/products.json`)
 );
@@ -16,6 +26,7 @@ let products = JSON.parse(
 const getAllProducts = (req, res) => {
 	res.status(200).json({
 		results: products.length,
+		requestedAt: req.requestTime,
 		data: {
 			products: products,
 		},
