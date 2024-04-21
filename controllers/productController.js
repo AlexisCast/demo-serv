@@ -1,13 +1,13 @@
-const fs = require("fs");
+const fs = require('fs');
 
 let products = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/products.json`)
+  fs.readFileSync(`${__dirname}/../dev-data/products.json`),
 );
 
 exports.checkID = (req, res, next, val) => {
-  console.log(`Tour id is: ${val}`);
+  console.log(`product id is: ${val}`);
   const { id } = req.params;
-  
+
   const product = products.find((item) => item.id == id);
 
   if (!product) {
@@ -18,20 +18,20 @@ exports.checkID = (req, res, next, val) => {
 
   req.product = product;
 
-  next()
-}
+  next();
+};
 
 exports.checkBody = (req, res, next) => {
   const { name, price } = req.body;
 
   if (!name || !price) {
     return res.status(400).json({
-      msg: `Missing name or price`
-    })
+      msg: `Missing name or price`,
+    });
   }
-  
-  next()
-}
+
+  next();
+};
 
 exports.getAllProducts = (req, res) => {
   res.status(200).json({
@@ -46,8 +46,7 @@ exports.getAllProducts = (req, res) => {
 exports.getProduct = (req, res) => {
   res.status(200).json({
     data: {
-      product: req.product
-      ,
+      product: req.product,
     },
   });
 };
@@ -70,20 +69,19 @@ exports.createProduct = (req, res) => {
           product: { newProduct },
         },
       });
-    }
+    },
   );
 };
 
 exports.updateProduct = (req, res) => {
-  const product = req.product;
-
+  const { product } = req;
   const updatedProduct = {
     ...product,
     ...req.body,
   };
 
-  const updatedProducts = products.map((product) =>
-    product.id === updatedProduct.id ? updatedProduct : product
+  const updatedProducts = products.map((prod) =>
+    prod.id == updatedProduct.id ? updatedProduct : prod,
   );
 
   fs.writeFile(
@@ -92,10 +90,10 @@ exports.updateProduct = (req, res) => {
     (err) => {
       res.status(200).json({
         data: {
-          product: updatedProduct
+          product: updatedProduct,
         },
       });
-    }
+    },
   );
 };
 
@@ -109,7 +107,7 @@ exports.deleteProduct = (req, res) => {
     });
   }
 
-  const updatedProducts = products.filter((product) => product.id != id);
+  const updatedProducts = products.filter((prod) => prod.id !== id);
 
   fs.writeFile(
     `${__dirname}/dev-data/products.json`,
@@ -120,7 +118,6 @@ exports.deleteProduct = (req, res) => {
           product: { product },
         },
       });
-    }
+    },
   );
 };
-
