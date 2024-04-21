@@ -4,6 +4,21 @@ let products = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/products.json`)
 );
 
+exports.checkID = (req, res, next, val) => {
+  const { id } = req.params;
+  const product = products.find((item) => item.id == id);
+
+  if (!product) {
+    return res.status(404).json({
+      msg: `${id} invalid id`,
+    });
+  }
+
+  req.product = product;
+
+  next()
+}
+
 exports.getAllProducts = (req, res) => {
   res.status(200).json({
     results: products.length,
@@ -15,18 +30,11 @@ exports.getAllProducts = (req, res) => {
 };
 
 exports.getProduct = (req, res) => {
-  const { id } = req.params;
-  const product = products.find((item) => item.id == id);
-  if (product) {
-    return res.status(200).json({
-      data: {
-        product,
-      },
-    });
-  }
-
-  res.status(404).json({
-    msg: `${id} invalid id`,
+  res.status(200).json({
+    data: {
+      product: req.product
+      ,
+    },
   });
 };
 
@@ -53,14 +61,7 @@ exports.createProduct = (req, res) => {
 };
 
 exports.updateProduct = (req, res) => {
-  const { id } = req.params;
-  const product = products.find((item) => item.id == id);
-
-  if (!product) {
-    return res.status(404).json({
-      msg: `${id} invalid id`,
-    });
-  }
+  const product = req.product;
 
   const updatedProduct = {
     ...product,
@@ -77,7 +78,7 @@ exports.updateProduct = (req, res) => {
     (err) => {
       res.status(200).json({
         data: {
-          product: { updatedProduct },
+          product: updatedProduct
         },
       });
     }
