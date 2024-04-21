@@ -61,6 +61,63 @@ app.post("/api/v1/products", (req, res) => {
 	);
 });
 
+app.patch("/api/v1/products/:id", (req, res) => {
+	const { id } = req.params;
+	const product = products.find((item) => item.id == id);
+
+	if (!product) {
+		return res.status(404).json({
+			msg: `${id} invalid id`,
+		});
+	}
+
+	const updatedProduct = {
+		...product,
+		...req.body,
+	};
+
+	const updatedProducts = products.map((product) =>
+		product.id === updatedProduct.id ? updatedProduct : product
+	);
+
+	fs.writeFile(
+		`${__dirname}/dev-data/products.json`,
+		JSON.stringify(updatedProducts),
+		(err) => {
+			res.status(200).json({
+				data: {
+					product: { updatedProduct },
+				},
+			});
+		}
+	);
+});
+
+app.delete("/api/v1/products/:id", (req, res) => {
+	const { id } = req.params;
+	const product = products.find((item) => item.id == id);
+
+	if (!product) {
+		return res.status(404).json({
+			msg: `${id} invalid id`,
+		});
+	}
+
+	const updatedProducts = products.filter((product) => product.id != id);
+
+	fs.writeFile(
+		`${__dirname}/dev-data/products.json`,
+		JSON.stringify(updatedProducts),
+		(err) => {
+			res.status(200).json({
+				data: {
+					product: { product },
+				},
+			});
+		}
+	);
+});
+
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
