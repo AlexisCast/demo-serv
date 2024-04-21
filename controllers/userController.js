@@ -1,5 +1,4 @@
 exports.getAllUsers = (req, res) => {
-  console.log("xx")
   res.status(500).json({
     msg: "This route is not yet defined",
   });
