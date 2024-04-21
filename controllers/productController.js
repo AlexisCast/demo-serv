@@ -5,9 +5,9 @@ let products = JSON.parse(
 );
 
 exports.checkID = (req, res, next, val) => {
-  const { id } = req.params;
   console.log(`Tour id is: ${val}`);
-
+  const { id } = req.params;
+  
   const product = products.find((item) => item.id == id);
 
   if (!product) {
