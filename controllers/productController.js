@@ -21,6 +21,18 @@ exports.checkID = (req, res, next, val) => {
   next()
 }
 
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({
+      msg: `Missing name or price`
+    })
+  }
+  
+  next()
+}
+
 exports.getAllProducts = (req, res) => {
   res.status(200).json({
     results: products.length,
