@@ -167,23 +167,34 @@ const deleteUser = (req, res) => {
 // app.delete("/api/v1/products/:id", deleteProduct);
 
 //	3) Routes
-app.route("/api/v1/products")
+
+const productRouter = express.Router();
+const userRouter = express.Router();
+
+productRouter
+	.route("/")
 	.get(getAllProducts)
 	.post(createProduct);
 
-app.route("/api/v1/products/:id")
+productRouter
+	.route("/:id")
 	.get(getProduct)
 	.patch(updateProduct)
 	.delete(deleteProduct);
 
-app.route("/api/v1/users")
+userRouter
+	.route("/")
 	.get(getAllUsers)
 	.post(createUser);
 
-app.route("/api/v1/users/:id")
+userRouter
+	.route("/:id")
 	.get(getUser)
 	.patch(updateUser)
 	.delete(deleteUser);
+
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/user", userRouter);
 
 //	4) Star Server
 app.listen(port, () => {
