@@ -2,7 +2,15 @@ const Product = require('../models/productModel');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    let queryStr = JSON.stringify(req.query);
+
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    //api/v1/products?state=true&price[gte]=40 with filtering gte gt lte lt
+
+    // const products = await Product.find(req.query);
+    //{{url}}/api/v1/products?state=true   with no filtering gte gt lte lt
+
+    const products = await Product.find(JSON.parse(queryStr));
 
     res.status(200).json({
       results: products.length,
