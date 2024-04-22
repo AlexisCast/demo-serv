@@ -1,26 +1,4 @@
-// const fs = require('fs');
 const Product = require('../models/productModel');
-
-/*let products = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/products.json`),
-);
-
-exports.checkID = (req, res, next, val) => {
-  console.log(`product id is: ${val}`);
-  const { id } = req.params;
-
-  const product = products.find((item) => item.id == id);
-
-  if (!product) {
-    return res.status(404).json({
-      msg: `${id} invalid id`,
-    });
-  }
-
-  req.product = product;
-
-  next();
-};*/
 
 exports.checkBody = (req, res, next) => {
   const { name, price } = req.body;
@@ -52,12 +30,24 @@ exports.getProduct = (req, res) => {
   });
 };
 
-exports.createProduct = (req, res) => {
-  res.status(201).json({
-    data: {
-      // product: { newProduct },
-    },
-  });
+exports.createProduct = async (req, res) => {
+  try {
+    // const newProduct=new Product(req.body);
+    // newProduct.save()
+
+    const newProduct = await Product.create(req.body);
+
+    res.status(201).json({
+      data: {
+        product: newProduct,
+      },
+    });
+  } catch (error) {
+    console.warn(error);
+    res.status(400).json({
+      msg: 'Invalid data sent!',
+    });
+  }
 };
 
 exports.updateProduct = (req, res) => {

@@ -3,17 +3,12 @@ const productController = require('../controllers/productController');
 
 const router = express.Router();
 
-router.param('id', (req, res, next, val) => {
-  console.log(`product id is: ${val}`);
-  next();
-});
-
 // router.param('id', productController.checkID);
 
 router
   .route('/')
   .get(productController.getAllProducts)
-  .post(productController.checkBody, productController.createProduct);
+  .post(productController.createProduct);
 
 router
   .route('/:id')
