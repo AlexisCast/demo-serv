@@ -75,17 +75,29 @@ exports.updateProduct = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(400).json({
+    res.status(404).json({
       msg: 'Not able to update!',
       err: error,
     });
   }
 };
 
-exports.deleteProduct = (req, res) => {
-  res.status(200).json({
-    data: {
-      // product: { product },
-    },
-  });
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id, {
+      new: true,
+    });
+
+    res.status(200).json({
+      data: {
+        product: deletedProduct,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      msg: 'Could not delete product!',
+      err: error,
+    });
+  }
 };
