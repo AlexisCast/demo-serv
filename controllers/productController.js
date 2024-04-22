@@ -1,7 +1,7 @@
 const Product = require('../models/productModel');
 
 exports.getAllProducts = async (req, res) => {
-  const { sort = 'name', ...objQuery } = req.query;
+  const { fields = '-__v', sort = 'name', ...objQuery } = req.query;
   try {
     // 1) Filter
     let queryStr = JSON.stringify(objQuery);
@@ -20,7 +20,13 @@ exports.getAllProducts = async (req, res) => {
       query = query.sort(sortBy);
     }
 
-    // 3)Execute
+    // 3) Fields
+    if (fields) {
+      const fieldsBy = fields.split(',').join(' ');
+      query = query.select(fieldsBy);
+    }
+
+    // 4) Execute
     const products = await query;
 
     res.status(200).json({
