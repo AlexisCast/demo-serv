@@ -1,7 +1,13 @@
 const Product = require('../models/productModel');
 
 exports.getAllProducts = async (req, res) => {
-  const { fields = '-__v', sort = 'name', ...objQuery } = req.query;
+  const {
+    page = 1,
+    limit = 15,
+    fields = '-__v',
+    sort = 'name',
+    ...objQuery
+  } = req.query;
   try {
     // 1) Filter
     let queryStr = JSON.stringify(objQuery);
@@ -26,11 +32,23 @@ exports.getAllProducts = async (req, res) => {
       query = query.select(fieldsBy);
     }
 
-    // 4) Execute
+    // 4) Pagination
+    let totalProtducts;
+    if (page) {
+      totalProtducts = await Product.countDocuments(query);
+    }
+
+    const pageNum = page * 1;
+    const limitNum = limit * 1;
+    const skipNum = (pageNum - 1) * limitNum;
+    query = query.skip(skipNum).limit(limitNum);
+
+    // 5) Execution
     const products = await query;
 
     res.status(200).json({
-      results: products.length,
+      results: totalProtducts,
+      shown: products.length,
       requestedAt: req.requestTime,
       data: {
         products: products,
@@ -38,7 +56,7 @@ exports.getAllProducts = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({
-      msg: 'Not able to get products',
+      msg: error.message ? error.message : 'Not able to get products',
       err: error,
     });
   }
