@@ -1,15 +1,9 @@
 const Product = require('../models/productModel');
-const {
-  filterFunct,
-  sortFunct,
-  fieldsFunct,
-  paginationFunct,
-} = require('../utils/apiFeatures');
 
 exports.aliasLessThanHundred = async (req, res, next) => {
   // req.query.price = { $lte: 100 };   // normal object
   req.query.price = { lte: 100 };
-  // req.query.available = true;
+  req.query.available = true;
   next();
 };
 
@@ -23,13 +17,26 @@ exports.getAllProducts = async (req, res) => {
   } = req.query;
   try {
     // 1) Filter
-    let query = filterFunct(Product, objQuery);
+    let queryStr = JSON.stringify(objQuery);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    //api/v1/products?state=true&price[gte]=40 with filtering gte gt lte lt
+
+    // let query = Product.find(objQuery);  // normal object
+    //{{url}}/api/v1/products?state=true   with no filtering gte gt lte lt
+
+    let query = Product.find(JSON.parse(queryStr));
 
     // 2)Sort
-    query = sortFunct(query, sort);
+    if (sort) {
+      const sortBy = sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    }
 
     // 3) Fields
-    query = fieldsFunct(query, fields);
+    if (fields) {
+      const fieldsBy = fields.split(',').join(' ');
+      query = query.select(fieldsBy);
+    }
 
     // 4) Pagination
     let totalProtducts;
@@ -37,7 +44,10 @@ exports.getAllProducts = async (req, res) => {
       totalProtducts = await Product.countDocuments(query);
     }
 
-    query = paginationFunct(Product, query, page, limit);
+    const pageNum = page * 1;
+    const limitNum = limit * 1;
+    const skipNum = (pageNum - 1) * limitNum;
+    query = query.skip(skipNum).limit(limitNum);
 
     // 5) Execution
     const products = await query;
