@@ -1,5 +1,12 @@
 const Product = require('../models/productModel');
 
+exports.aliasLessThanHundred = async (req, res, next) => {
+  // req.query.price = { $lte: 50 };   // normal object
+  req.query.price = { lte: 50 };
+  req.query.available = true;
+  next();
+};
+
 exports.getAllProducts = async (req, res) => {
   const {
     page = 1,
@@ -11,11 +18,10 @@ exports.getAllProducts = async (req, res) => {
   try {
     // 1) Filter
     let queryStr = JSON.stringify(objQuery);
-
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     //api/v1/products?state=true&price[gte]=40 with filtering gte gt lte lt
 
-    // const products = await Product.find(objQuery);
+    // let query = Product.find(objQuery);  // normal object
     //{{url}}/api/v1/products?state=true   with no filtering gte gt lte lt
 
     let query = Product.find(JSON.parse(queryStr));
