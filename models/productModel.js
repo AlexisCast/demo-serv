@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const productSchema = new mongoose.Schema(
   {
@@ -7,6 +8,9 @@ const productSchema = new mongoose.Schema(
       required: [true, 'A product must have a name'],
       unique: true,
       trim: true,
+    },
+    slugName: {
+      type: String,
     },
     price: {
       type: Number,
@@ -39,6 +43,22 @@ const productSchema = new mongoose.Schema(
     strictQuery: 'throw',
   },
 );
+
+//Document midddleware: runs before .save() and .create()
+productSchema.pre('save', function (next) {
+  this.slugName = slugify(this.name, { lower: true });
+  next();
+});
+
+// productSchema.pre('save', (next) => {
+//   console.log('will save document...');
+//   next();
+// });
+
+// productSchema.post('save', (doc, next) => {
+//   console.log(doc);
+//   next();
+// });
 
 const Product = mongoose.model('Product', productSchema);
 
