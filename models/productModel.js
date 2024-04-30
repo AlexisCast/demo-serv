@@ -60,6 +60,9 @@ const productSchema = new mongoose.Schema(
       },
       default: 'exist',
     },
+    updatedAt: {
+      type: Date,
+    },
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -68,6 +71,7 @@ const productSchema = new mongoose.Schema(
   },
   {
     strictQuery: 'throw',
+    timestamps: true,
   },
 );
 
