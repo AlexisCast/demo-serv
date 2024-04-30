@@ -21,6 +21,20 @@ const productSchema = new mongoose.Schema(
       required: [true, 'A product must have a price'],
       min: [0.01, 'Must be at least 0.01, got {VALUE}'],
     },
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          //asuming it is being updated but needs (price & discountPrice to pass)
+          if (this._update) {
+            return val < this.getUpdate().$set.price;
+          }
+          //works only on post or when runValidators is false
+          return val < this.price;
+        },
+        message: 'Discount price({VALUE}) should be below the regular price',
+      },
+    },
     description: {
       type: String,
       required: [true, 'A product must have a description'],
@@ -40,11 +54,14 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: true,
       enum: {
         values: ['toDelete', 'archived', 'exist'],
         message: 'status is either: toDelete, archived, exist',
       },
+      default: 'exist',
+    },
+    updatedAt: {
+      type: Date,
     },
     createdAt: {
       type: Date,
@@ -54,6 +71,7 @@ const productSchema = new mongoose.Schema(
   },
   {
     strictQuery: 'throw',
+    timestamps: true,
   },
 );
 
