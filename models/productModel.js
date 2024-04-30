@@ -8,6 +8,10 @@ const productSchema = new mongoose.Schema(
       required: [true, 'A product must have a name'],
       unique: true,
       trim: true,
+      minlength: [
+        4,
+        'A product name must have more or equal then 4 characteres',
+      ],
     },
     slugName: {
       type: String,
@@ -15,6 +19,7 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, 'A product must have a price'],
+      min: [0.01, 'Must be at least 0.01, got {VALUE}'],
     },
     description: {
       type: String,
@@ -32,6 +37,14 @@ const productSchema = new mongoose.Schema(
     state: {
       type: Boolean,
       default: true,
+    },
+    status: {
+      type: String,
+      default: true,
+      enum: {
+        values: ['toDelete', 'archived', 'exist'],
+        message: 'status is either: toDelete, archived, exist',
+      },
     },
     createdAt: {
       type: Date,
