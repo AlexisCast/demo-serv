@@ -1,5 +1,9 @@
+const { createHandler } = require('graphql-http/lib/use/express');
 const express = require('express');
 const morgan = require('morgan');
+
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolver');
 
 const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -18,6 +22,15 @@ app.use((req, res, next) => {
   console.log('hello!');
   next();
 });
+
+// Create and use the GraphQL handler.
+app.all(
+  '/graphql',
+  createHandler({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+  }),
+);
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
