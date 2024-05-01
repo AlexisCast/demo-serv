@@ -18,19 +18,10 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
-app.use((req, res, next) => {
-  console.log('hello!');
-  next();
-});
-
-// Create and use the GraphQL handler.
-app.all(
-  '/graphql',
-  createHandler({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
-  }),
-);
+// app.use((req, res, next) => {
+//   console.log('hello!');
+//   next();
+// });
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -38,6 +29,14 @@ app.use((req, res, next) => {
 });
 
 //	3) Routes
+// Create and use the GraphQL handler.
+app.use(
+  '/graphql',
+  createHandler({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+  }),
+);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
 
