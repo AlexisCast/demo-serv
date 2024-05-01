@@ -5,6 +5,7 @@ const {
   fieldsFunct,
   paginationFunct,
 } = require('../utils/apiFeatures');
+const catchAsync = require('../utils/catchAsync');
 
 exports.aliasLessThanHundred = async (req, res, next) => {
   // req.query.price = { $lte: 100 };   // normal object
@@ -76,26 +77,27 @@ exports.getProduct = async (req, res) => {
   }
 };
 
-exports.createProduct = async (req, res) => {
-  try {
-    // const newProduct=new Product(req.body);
-    // newProduct.save()
+exports.createProduct = catchAsync(async (req, res) => {
+  // try {
 
-    const newProduct = await Product.create(req.body);
+  // const newProduct=new Product(req.body);
+  // newProduct.save()
 
-    res.status(201).json({
-      data: {
-        product: newProduct,
-      },
-    });
-  } catch (error) {
-    console.warn(error);
-    res.status(400).json({
-      msg: 'Invalid data sent!',
-      err: error,
-    });
-  }
-};
+  const newProduct = await Product.create(req.body);
+
+  res.status(201).json({
+    data: {
+      product: newProduct,
+    },
+  });
+  // } catch (error) {
+  //   console.warn(error);
+  //   res.status(400).json({
+  //     msg: 'Invalid data sent!',
+  //     err: error,
+  //   });
+  // }
+});
 
 exports.updateProduct = async (req, res) => {
   try {

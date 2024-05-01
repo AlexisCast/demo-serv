@@ -2,11 +2,14 @@ const { createHandler } = require('graphql-http/lib/use/express');
 const express = require('express');
 const morgan = require('morgan');
 
-const graphqlSchema = require('./graphql/schema');
-const graphqlResolver = require('./graphql/resolver');
+const globalErrorHandler = require('./controllers/errorController');
+const { appError } = require('./utils/appError');
 
 const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/userRoutes');
+
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolver');
 
 const app = express();
 
@@ -39,5 +42,11 @@ app.use(
 );
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
+
+app.all('*', (req, res, next) => {
+  next(appError(`Can't find ${req.originalUrl} on the server!`, 404));
+});
+
+app.use(globalErrorHandler);
 
 module.exports = app;
