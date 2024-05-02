@@ -1,4 +1,5 @@
 const { createHandler } = require('graphql-http/lib/use/express');
+const { ruruHTML } = require('ruru/server');
 const express = require('express');
 const morgan = require('morgan');
 
@@ -42,6 +43,12 @@ app.use(
 );
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
+
+// Serve the GraphiQL IDE.
+app.get('/graphqlIDE', (_req, res) => {
+  res.type('html');
+  res.end(ruruHTML({ endpoint: '/graphql' }));
+});
 
 app.all('*', (req, res, next) => {
   next(appError(`Can't find ${req.originalUrl} on the server!`, 404));
