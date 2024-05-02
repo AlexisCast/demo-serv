@@ -66,7 +66,7 @@ const productSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false, // to permanently hide
+      // select: false, // to permanently hide
     },
   },
   {
