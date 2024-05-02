@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'The password is required'],
       minlength: 8,
+      select: false,
     },
     passwordConfirm: {
       type: String,
@@ -49,6 +50,21 @@ userSchema.pre('save', async function (next) {
 
   // delete passwordConfirm field
   this.passwordConfirm = undefined;
+
+  next();
+});
+
+userSchema.methods.correctPassword = async function (
+  canditePassword,
+  userPassword,
+) {
+  return await bcryptjs.compareSync(canditePassword, userPassword);
+};
+
+// to remove password
+userSchema.post('save', (doc, next) => {
+  console.log('remove password');
+  doc.password = undefined;
 
   next();
 });
