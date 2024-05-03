@@ -12,7 +12,15 @@ router
 router
   .route('/:id')
   .get(authController.protect, ownerController.getOwner)
-  .patch(authController.protect, ownerController.updateOwner)
-  .delete(authController.protect, ownerController.deleteOwner);
+  .patch(
+    authController.protect,
+    authController.restrictTo('user', 'admin'),
+    ownerController.updateOwner,
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin'),
+    ownerController.deleteOwner,
+  );
 
 module.exports = router;
