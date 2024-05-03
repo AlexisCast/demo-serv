@@ -54,7 +54,14 @@ exports.getAllOwners = async (req, res) => {
 exports.getOwner = async (req, res) => {
   try {
     const { id } = req.params;
+
     const owner = await Owner.findById(id);
+
+    if (!owner) {
+      return res.status(404).json({
+        msg: 'Owner not found!',
+      });
+    }
 
     res.status(200).json({
       data: {
@@ -63,7 +70,7 @@ exports.getOwner = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({
-      msg: 'Owner not found!',
+      msg: 'Not able to get owner.',
       err: error,
     });
   }
