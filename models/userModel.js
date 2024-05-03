@@ -1,6 +1,8 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcryptjs = require('bcryptjs');
+const { type } = require('os');
 
 const userSchema = new mongoose.Schema(
   {
@@ -46,6 +48,12 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: {
       type: Date,
     },
+    passwordResetToken: {
+      type: String,
+    },
+    passwordResetExpires: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -85,6 +93,22 @@ userSchema.methods.changesPasswordAfter = function (JWTTimestamp) {
 
   // false means NOT changed
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  //10 minutes
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  console.log({ resetToken }, this.passwordResetExpires);
+
+  return resetToken;
 };
 
 // to remove password
