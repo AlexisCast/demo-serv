@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
@@ -68,4 +69,54 @@ exports.login = async (req, res, next) => {
     token,
     user: { name: user.name },
   });
+};
+
+exports.protect = async (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    // 1) Get token and check of it is there
+    let token;
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      token = authorization.split(' ')[1];
+    }
+
+    if (!token) {
+      return res.status(401).json({
+        msg: 'You are not logged in! Please log in to get access.',
+      });
+    }
+    // 2) Verification token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3) Check if user still exists
+    const freshUser = await User.findById(decoded.id);
+
+    if (!freshUser) {
+      return res.status(401).json({
+        msg: 'The user belonging to this token does no logner exist.',
+      });
+    }
+
+    // 4) Check if user changed password after the token was issued
+    if (freshUser.changesPasswordAfter(decoded.iat)) {
+      return res.status(401).json({
+        msg: 'User recently changed password! Please log in again.',
+      });
+    }
+
+    // 5) Grant access to protected route
+    req.user = freshUser;
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(403).send({
+        msg: 'Token has expired',
+      });
+    }
+
+    res.status(401).send({
+      msg: 'Token not valid',
+    });
+  }
 };
