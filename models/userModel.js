@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema(
         message: 'Password and passwordConfirm are not the same',
       },
     },
+    passwordChangedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -59,6 +62,21 @@ userSchema.methods.correctPassword = async function (
   userPassword,
 ) {
   return await bcryptjs.compareSync(canditePassword, userPassword);
+};
+
+userSchema.methods.changesPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
+    // console.log(changedTimestamp, JWTTimestamp);
+    // console.log(JWTTimestamp < changedTimestamp);
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // false means NOT changed
+  return false;
 };
 
 // to remove password
