@@ -9,6 +9,17 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = async (req, res, next) => {
   try {
     const { name, email, password, passwordConfirm } = req.body;
@@ -20,14 +31,7 @@ exports.signup = async (req, res, next) => {
       passwordConfirm,
     });
 
-    const token = signToken(newUser._id);
-
-    res.status(201).json({
-      token,
-      data: {
-        user: newUser,
-      },
-    });
+    createSendToken(newUser, 201, res);
   } catch (error) {
     console.warn(error);
     res.status(400).json({
@@ -65,12 +69,7 @@ exports.login = async (req, res, next) => {
   }
 
   // 3) if everything ok, send token to client
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    token,
-    user: { name: user.name },
-  });
+  createSendToken(user, 200, res);
 };
 
 exports.protect = async (req, res, next) => {
@@ -215,12 +214,7 @@ exports.resetPassword = async (req, res, next) => {
     // 3) update changedPasswordAt property for the user
 
     // 4) log the user in, send JWT
-    const token = signToken(user._id);
-
-    res.status(200).json({
-      token,
-      user: { name: user.name },
-    });
+    createSendToken(user, 200, res);
   } catch (error) {
     console.warn(error);
     res.status(400).json({
@@ -263,14 +257,7 @@ exports.updatedPassword = async (req, res, next) => {
     //NOT to use User.findByIdAndUpdate, is to use modal validators and pre save middlewares
 
     //4) log user, send JWT
-    const token = signToken(newUser._id);
-
-    res.status(200).json({
-      token,
-      data: {
-        user: newUser,
-      },
-    });
+    createSendToken(newUser, 200, res);
   } catch (error) {
     console.warn(error);
     res.status(400).json({
