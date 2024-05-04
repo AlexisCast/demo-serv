@@ -2,7 +2,6 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcryptjs = require('bcryptjs');
-const { type } = require('os');
 
 const userSchema = new mongoose.Schema(
   {
@@ -69,6 +68,14 @@ userSchema.pre('save', async function (next) {
 
   // delete passwordConfirm field
   this.passwordConfirm = undefined;
+
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
 
   next();
 });
