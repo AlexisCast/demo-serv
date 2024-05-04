@@ -35,7 +35,7 @@ exports.updateMe = async (req, res, next) => {
   // const filteredBody = filterObj(req.body, 'name', 'email');
   const filteredBody = filterObj(req.body, 'name');
 
-  // 3) update user document
+  // 4) update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
@@ -46,6 +46,22 @@ exports.updateMe = async (req, res, next) => {
       user: updatedUser,
     },
   });
+};
+
+exports.deleteMe = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { active: false });
+
+    res.status(200).json({
+      data: null,
+    });
+  } catch (error) {
+    console.warn(error);
+    res.status(400).json({
+      msg: 'Could not delete your account/user.',
+      err: error,
+    });
+  }
 };
 
 exports.createUser = (req, res) => {
