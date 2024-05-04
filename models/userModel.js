@@ -106,6 +106,7 @@ userSchema.methods.createPasswordResetToken = function () {
   //10 minutes
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
+  //resetToken should match on email
   console.log({ resetToken }, this.passwordResetExpires);
 
   return resetToken;

@@ -1,6 +1,7 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -153,8 +154,28 @@ exports.forgotPassword = async (req, res, next) => {
     // res.status(200).json({
     //   msg: `Email has been sent to ${req.body.email}`,
     // });
+
     // 3) send it to user's email
-    //TODO:send it to user's email
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const message = `Forgot your password? Submit a PATCH request with your new password and passwordCorfirm to: ${resetURL}.\nIf you did'nt forget your password, please ignore this email.`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Your password reset token (valid for 10min)',
+        message,
+      });
+
+      res.status(200).json({
+        msg: `Token has been sent to ${req.body.email}`,
+      });
+    } catch (error) {
+      console.warn(error);
+      res.status(400).json({
+        msg: 'Could not send email via host selected.',
+        err: error,
+      });
+    }
   } catch (error) {
     console.warn(error);
     res.status(400).json({
@@ -164,4 +185,5 @@ exports.forgotPassword = async (req, res, next) => {
   }
 };
 
+//TODO:finish reset password
 exports.resetPassword = (req, res, next) => {};
