@@ -48,6 +48,22 @@ exports.updateMe = async (req, res, next) => {
   });
 };
 
+exports.deleteMe = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { active: false });
+
+    res.status(200).json({
+      data: null,
+    });
+  } catch (error) {
+    console.warn(error);
+    res.status(400).json({
+      msg: 'Could not delete your account/user.',
+      err: error,
+    });
+  }
+};
+
 exports.createUser = (req, res) => {
   res.status(500).json({
     msg: 'This route is not yet defined',
