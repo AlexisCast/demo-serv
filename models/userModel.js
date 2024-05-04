@@ -2,7 +2,6 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcryptjs = require('bcryptjs');
-const { type } = require('os');
 
 const userSchema = new mongoose.Schema(
   {
@@ -73,6 +72,22 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+
+  next();
+});
+
+// to remove password
+userSchema.post('save', (doc, next) => {
+  console.log('remove password');
+  doc.password = undefined;
+
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   canditePassword,
   userPassword,
@@ -111,14 +126,6 @@ userSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
-
-// to remove password
-userSchema.post('save', (doc, next) => {
-  console.log('remove password');
-  doc.password = undefined;
-
-  next();
-});
 
 const User = mongoose.model('User', userSchema);
 
