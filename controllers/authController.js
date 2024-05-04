@@ -229,3 +229,53 @@ exports.resetPassword = async (req, res, next) => {
     });
   }
 };
+
+exports.updatedPassword = async (req, res, next) => {
+  try {
+    const { currentPassword, password, passwordConfirm } = req.body;
+    const { _id } = req.user;
+    // 1) get user from collection
+    const user = await User.findById(_id).select('+password');
+
+    if (!user) {
+      return res.status(401).json({
+        msg: `user does not exist`,
+      });
+    }
+
+    // 2) check if POSTed current password is correct
+    const isCorrect = await user.correctPassword(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCorrect) {
+      return res.status(401).json({
+        msg: `incorrect current password`,
+      });
+    }
+
+    // 3) if so, update the password
+    user.password = password;
+    user.passwordConfirm = passwordConfirm;
+
+    const newUser = await user.save();
+    //NOT to use User.findByIdAndUpdate, is to use modal validators and pre save middlewares
+
+    //4) log user, send JWT
+    const token = signToken(newUser._id);
+
+    res.status(200).json({
+      token,
+      data: {
+        user: newUser,
+      },
+    });
+  } catch (error) {
+    console.warn(error);
+    res.status(400).json({
+      msg: 'Could not update password.',
+      err: error,
+    });
+  }
+};
