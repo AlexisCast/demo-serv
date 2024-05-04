@@ -80,6 +80,14 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+// to remove password
+userSchema.post('save', (doc, next) => {
+  console.log('remove password');
+  doc.password = undefined;
+
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   canditePassword,
   userPassword,
@@ -118,14 +126,6 @@ userSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
-
-// to remove password
-userSchema.post('save', (doc, next) => {
-  console.log('remove password');
-  doc.password = undefined;
-
-  next();
-});
 
 const User = mongoose.model('User', userSchema);
 
