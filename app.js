@@ -2,6 +2,7 @@ const { createHandler } = require('graphql-http/lib/use/express');
 const { ruruHTML } = require('ruru/server');
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
@@ -15,10 +16,17 @@ const graphqlResolver = require('./graphql/resolver');
 
 const app = express();
 
-//	1) Middlewares
+//	1) Gobal Middlewares
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  windowMS: 60 * 60 * 1000, //60min
+  message: 'Too many request from this IP',
+});
+app.use('/api', limiter);
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
