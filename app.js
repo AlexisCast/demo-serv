@@ -3,6 +3,7 @@ const { ruruHTML } = require('ruru/server');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
@@ -17,10 +18,16 @@ const graphqlResolver = require('./graphql/resolver');
 const app = express();
 
 //	1) Gobal Middlewares
+
+// set security HTTP headers
+app.use(helmet());
+
+// development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// limit requests from same API
 const limiter = rateLimit({
   limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
   windowMS: 60 * 60 * 1000, //60min
@@ -28,9 +35,14 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(express.json());
+// body parser, read data from body into req.body
+// app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
+
+// serving static files
 app.use(express.static(`${__dirname}/public`));
 
+// test middleware
 // app.use((req, res, next) => {
 //   console.log('hello!');
 //   next();
