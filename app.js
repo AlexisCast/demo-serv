@@ -4,6 +4,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
@@ -39,11 +41,17 @@ app.use('/api', limiter);
 // app.use(express.json());
 app.use(express.json({ limit: '10kb' }));
 
+// data sanitization against noSQL query injection
+app.use(mongoSanitize());
+
 // serving static files
 app.use(express.static(`${__dirname}/public`));
 
+//data sanitization
+app.use(xss());
+
 // test middleware
-// app.use((req, res, next) => {
+// app.use((req, res, next) =Z> {
 //   console.log('hello!');
 //   next();
 // });
