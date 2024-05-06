@@ -6,7 +6,8 @@ const dbConnection = async () => {
     // console.log(con.connection);
     console.log('DB Online!');
   } catch (error) {
-    console.log(error);
+    console.log('ERROR!');
+    console.warn(error);
     throw new Error('Error initiating DB');
   }
 };
