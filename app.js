@@ -12,8 +12,8 @@ const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
 
 const authRouter = require('./routes/authRoutes');
-const productRouter = require('./routes/productRoutes');
 const ownerRoutes = require('./routes/ownerRoutes');
+const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/userRoutes');
 
 const graphqlSchema = require('./graphql/schema');
@@ -76,8 +76,8 @@ app.use(
   }),
 );
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/products', productRouter);
 app.use('/api/v1/owners', ownerRoutes);
+app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
 
 // Serve the GraphiQL IDE.
