@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const cors = require('cors');
 
 const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
@@ -20,6 +21,9 @@ const graphqlResolver = require('./graphql/resolver');
 const app = express();
 
 //	1) Gobal Middlewares
+
+//CORS
+app.use(cors());
 
 // set security HTTP headers
 app.use(helmet());
