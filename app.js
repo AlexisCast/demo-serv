@@ -11,6 +11,7 @@ const cors = require('cors');
 const globalErrorHandler = require('./controllers/errorController');
 const { appError } = require('./utils/appError');
 
+const authRouter = require('./routes/authRoutes');
 const productRouter = require('./routes/productRoutes');
 const ownerRoutes = require('./routes/ownerRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -74,6 +75,7 @@ app.use(
     rootValue: graphqlResolver,
   }),
 );
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/owners', ownerRoutes);
 app.use('/api/v1/users', userRouter);
