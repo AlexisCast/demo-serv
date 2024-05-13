@@ -13,6 +13,7 @@ const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
   res.status(statusCode).json({
+    status: 'success',
     token,
     data: {
       user,
@@ -31,11 +32,16 @@ exports.signup = async (req, res, next) => {
       passwordConfirm,
     });
 
-    createSendToken(newUser, 201, res);
+    const userToSend = {
+      name: newUser.name,
+    };
+
+    createSendToken(userToSend, 201, res);
   } catch (error) {
     console.warn(error);
     res.status(400).json({
-      msg: 'Invalid data sent!',
+      status: 'fail',
+      msg: error.message ? error.message : 'Invalid data sent!',
       err: error,
     });
   }
@@ -47,6 +53,7 @@ exports.login = async (req, res, next) => {
   // 1) check if email and password exist
   if (!email || !password) {
     return res.status(400).json({
+      status: 'error',
       msg: 'Provide email and password',
     });
   }
@@ -56,7 +63,8 @@ exports.login = async (req, res, next) => {
 
   if (!user) {
     return res.status(401).json({
-      msg: `incorrect password or email`,
+      status: 'error',
+      msg: `Incorrect password or email`,
     });
   }
 
@@ -64,7 +72,8 @@ exports.login = async (req, res, next) => {
 
   if (!isCorrect) {
     return res.status(401).json({
-      msg: `incorrect password or email`,
+      status: 'error',
+      msg: `Incorrect password or email`,
     });
   }
 
@@ -84,6 +93,7 @@ exports.protect = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).json({
+        status: 'error',
         msg: 'You are not logged in! Please log in to get access.',
       });
     }
@@ -95,6 +105,7 @@ exports.protect = async (req, res, next) => {
 
     if (!freshUser) {
       return res.status(401).json({
+        status: 'error',
         msg: 'The user belonging to this token does no logner exist.',
       });
     }
@@ -102,6 +113,7 @@ exports.protect = async (req, res, next) => {
     // 4) Check if user changed password after the token was issued
     if (freshUser.changesPasswordAfter(decoded.iat)) {
       return res.status(401).json({
+        status: 'error',
         msg: 'User recently changed password! Please log in again.',
       });
     }
@@ -112,11 +124,13 @@ exports.protect = async (req, res, next) => {
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       return res.status(403).send({
+        status: 'fail',
         msg: 'Token has expired',
       });
     }
 
     res.status(401).send({
+      status: 'fail',
       msg: 'Token not valid',
     });
   }
@@ -128,6 +142,7 @@ exports.restrictTo = (...roles) => {
     //roles is an a array
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
+        status: 'error',
         msg: 'You do not have permission to perform this action',
       });
     }
@@ -143,6 +158,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
+        status: 'error',
         msg: 'There is no user with email address.',
       });
     }
@@ -167,11 +183,13 @@ exports.forgotPassword = async (req, res, next) => {
       });
 
       res.status(200).json({
+        status: 'success',
         msg: `Token has been sent to ${req.body.email}`,
       });
     } catch (error) {
       console.warn(error);
       res.status(400).json({
+        status: 'fail',
         msg: 'Could not send email via host selected.',
         err: error,
       });
@@ -179,6 +197,7 @@ exports.forgotPassword = async (req, res, next) => {
   } catch (error) {
     console.warn(error);
     res.status(400).json({
+      status: 'fail',
       msg: 'Could not send email.',
       err: error,
     });
@@ -201,6 +220,7 @@ exports.resetPassword = async (req, res, next) => {
     // 2) if token has not expired, and there is user, set the new password
     if (!user) {
       return res.status(400).json({
+        status: 'error',
         msg: 'Token is invalid or has expired.',
       });
     }
@@ -218,6 +238,7 @@ exports.resetPassword = async (req, res, next) => {
   } catch (error) {
     console.warn(error);
     res.status(400).json({
+      status: 'fail',
       msg: 'Invalid data sent!',
       err: error,
     });
@@ -233,7 +254,8 @@ exports.updatedPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({
-        msg: `user does not exist`,
+        status: 'error',
+        msg: `User does not exist`,
       });
     }
 
@@ -245,7 +267,8 @@ exports.updatedPassword = async (req, res, next) => {
 
     if (!isCorrect) {
       return res.status(401).json({
-        msg: `incorrect current password`,
+        status: 'error',
+        msg: `Incorrect current password`,
       });
     }
 
@@ -261,6 +284,7 @@ exports.updatedPassword = async (req, res, next) => {
   } catch (error) {
     console.warn(error);
     res.status(400).json({
+      status: 'fail',
       msg: 'Could not update password.',
       err: error,
     });
