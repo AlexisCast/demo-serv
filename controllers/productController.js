@@ -20,11 +20,21 @@ exports.getAllProducts = async (req, res) => {
     limit = 15,
     fields = '-__v',
     sort = 'name',
+    search = '',
     ...objQuery
   } = req.query;
   try {
     // 1) Filter
     let query = filterFunct(Product, objQuery);
+
+    // 1.5) Search
+    if (search !== '') {
+      const regex = new RegExp(search, 'i');
+      query = query.find({
+        $or: [{ name: regex }],
+        $and: [{ state: true }],
+      });
+    }
 
     // 2)Sort
     query = sortFunct(query, sort);

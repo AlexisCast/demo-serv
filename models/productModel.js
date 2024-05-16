@@ -3,6 +3,10 @@ const slugify = require('slugify');
 
 const productSchema = new mongoose.Schema(
   {
+    category: {
+      type: String,
+      default: 'other',
+    },
     name: {
       type: String,
       required: [true, 'A product must have a name'],
@@ -46,7 +50,16 @@ const productSchema = new mongoose.Schema(
     },
     img: {
       type: String,
-      default: '',
+    },
+    rating: {
+      stars: {
+        type: Number,
+        default: 0,
+      },
+      comments: {
+        type: Number,
+        default: 0,
+      },
     },
     state: {
       type: Boolean,

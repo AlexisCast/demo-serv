@@ -25,9 +25,14 @@ npx nodemon app
 - NODEMAILER_FROM=anemail@provider.com
 - NODEMAILER_PORT=mailtrapportnumbner
 
+- CLOUDINARY_URL=cloudinary://...
+- CLOUDINARY_FOLDER=nameOfFolder
+
 https://miracleio.me/snippets/use-gmail-with-nodemailer/
 
 https://mailtrap.io/inboxes/2850586/messages
+https://cloudinary.com/blog/guest_post/upload-images-to-cloudinary-with-node-js-and-react
+
 
 ```bash
 PORT=8080
@@ -42,4 +47,7 @@ NODEMAILER_AUTH_USER=
 NODEMAILER_AUTH_PASS=
 NODEMAILER_FROM=
 NODEMAILER_PORT=
+
+CLOUDINARY_URL=
+CLOUDINARY_FOLDER=
 ```
