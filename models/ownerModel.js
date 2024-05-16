@@ -3,7 +3,7 @@ const validator = require('validator');
 
 const ownerSchema = new mongoose.Schema(
   {
-    firstname: {
+    firstName: {
       type: String,
       required: [true, 'The name is required'],
     },

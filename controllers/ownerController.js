@@ -36,6 +36,7 @@ exports.getAllOwners = async (req, res) => {
     const owners = await query;
 
     res.status(200).json({
+      status: 'success',
       results: totalOwners,
       shown: owners.length,
       requestedAt: req.requestTime,
