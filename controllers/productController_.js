@@ -13,6 +13,7 @@ exports.getAllProducts = async (req, res) => {
     limit = 15,
     fields = '-__v',
     sort = 'name',
+    search = '',
     ...objQuery
   } = req.query;
   try {
@@ -25,6 +26,14 @@ exports.getAllProducts = async (req, res) => {
     //{{url}}/api/v1/products?state=true   with no filtering gte gt lte lt
 
     let query = Product.find(JSON.parse(queryStr));
+
+    if (search !== '') {
+      const regex = new RegExp(search, 'i');
+      query = query.find({
+        $or: [{ name: regex }],
+        $and: [{ state: true }],
+      });
+    }
 
     // 2)Sort
     if (sort) {
